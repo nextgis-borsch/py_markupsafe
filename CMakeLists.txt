@@ -125,6 +125,12 @@ endif()
 if(OSX_FRAMEWORK)
     set(FLAGS "ARCHFLAGS=-arch x86_64")
 endif()
+if(WIN32)
+    string(REPLACE "\\"
+       "\\\\" VS120COMNTOOLS
+       $ENV{VS120COMNTOOLS})
+    set(FLAGS ${FLAGS} "VS90COMNTOOLS=${VS120COMNTOOLS}")
+endif()
 
 macro(build_py ver)
     add_custom_target(build_py${ver} ALL
@@ -221,6 +227,10 @@ else()
         set(BINDING_PATH ${CMAKE_CURRENT_BINARY_DIR}/${PYTHON${ver}_VERSION_MAJOR}.${PYTHON${ver}_VERSION_MINOR}/site-packages)
         install(DIRECTORY "${BINDING_PATH}/"
                 DESTINATION ${INSTALL_LIB_DIR}/Python${PYTHON${ver}_VERSION_MAJOR}${PYTHON${ver}_VERSION_MINOR}/site-packages
+                COMPONENT libraries)
+        set(BINDING_PATH ${CMAKE_CURRENT_BINARY_DIR}/${OUT_DIR_NAME}/markupsafe)
+        install(DIRECTORY "${BINDING_PATH}/"
+                DESTINATION ${INSTALL_LIB_DIR}/Python${PYTHON${ver}_VERSION_MAJOR}${PYTHON${ver}_VERSION_MINOR}/site-packages/markupsafe
                 COMPONENT libraries)
     endmacro()
 
