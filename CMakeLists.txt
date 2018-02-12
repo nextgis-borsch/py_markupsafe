@@ -3,7 +3,7 @@
 # Purpose:  CMake build scripts
 # Author:   Dmitry Baryshnikov, dmitry.baryshnikov@nexgis.com
 ################################################################################
-# Copyright (C) 2017, NextGIS <info@nextgis.com>
+# Copyright (C) 2017-2018, NextGIS <info@nextgis.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -126,10 +126,32 @@ if(OSX_FRAMEWORK)
     set(FLAGS "ARCHFLAGS=-arch x86_64")
 endif()
 if(WIN32)
-    string(REPLACE "\\"
-       "\\\\" VS120COMNTOOLS
-       $ENV{VS120COMNTOOLS})
-    set(FLAGS ${FLAGS} "VS90COMNTOOLS=${VS120COMNTOOLS}")
+    if(MSVC)
+        # Visual Studio 2005	Whidbey	8.0	             1400
+        # Visual Studio 2008	Orcas	9.0 	         1500
+        # Visual Studio 2010	Dev10/Rosario	10.0     1600
+        # Visual Studio 2012	Dev11	11.0             1700
+        # Visual Studio 2013	Dev12	12.0             1800
+        # Visual Studio 2015	Dev14	14.0             1900
+        # Visual Studio 2017	Dev15	15.0             1910-1919
+        if(MSVC_VERSION EQUAL 1400)
+            string(REPLACE "\\" "\\\\" VS_COMNTOOLS $ENV{VS80COMNTOOLS})
+        elseif(MSVC_VERSION EQUAL 1500)
+            string(REPLACE "\\" "\\\\" VS_COMNTOOLS $ENV{VS90COMNTOOLS})
+        elseif(MSVC_VERSION EQUAL 1600)
+            string(REPLACE "\\" "\\\\" VS_COMNTOOLS $ENV{VS100COMNTOOLS})
+        elseif(MSVC_VERSION EQUAL 1700)
+            string(REPLACE "\\" "\\\\" VS_COMNTOOLS $ENV{VS110COMNTOOLS})
+        elseif(MSVC_VERSION EQUAL 1800)
+            string(REPLACE "\\" "\\\\" VS_COMNTOOLS $ENV{VS120COMNTOOLS})
+        elseif(MSVC_VERSION EQUAL 1900)
+            string(REPLACE "\\" "\\\\" VS_COMNTOOLS $ENV{VS140COMNTOOLS})
+        elseif(MSVC_VERSION GREATER 1900)
+            string(REPLACE "\\" "\\\\" VS_COMNTOOLS $ENV{VS150COMNTOOLS})
+        endif()
+    endif()
+
+    set(FLAGS ${FLAGS} "VS90COMNTOOLS=${VS_COMNTOOLS}")
 endif()
 
 macro(build_py ver)
